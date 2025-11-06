@@ -74,7 +74,7 @@ tx_delay = tx_delay - min(tx_delay, [], "all");
 
 % Pre-allocate some storage
 rf_data_set = cell(1, num_elem);
-times = zeros(1, num_elem);
+t_start_set = zeros(1, num_elem);
 
 f = waitbar(0, "Calculating ...");
 for i = 1 : length(tx_angle)
@@ -82,7 +82,7 @@ for i = 1 : length(tx_angle)
     xdc_times_focus(emit_aperture, 0, tx_delay(i, :));
     [v, t1] = calc_scat_multi(emit_aperture, receive_aperture, scatter_pos, scatter_amp);
     rf_data_set{i} = v;
-    times(i) = t1;
+    t_start_set(i) = t1;
 end
 close(f);
 
@@ -105,17 +105,19 @@ hold off;
 err = tof - ref;
 fprintf("The maximum error is %e us\n", 1e6 * max(err, [], "all"));
 
-num_samp = round(times * fs);
-for i = 1 : num_elem
-    num_samp(i) = num_samp(i) + size(rf_data_set{i}, 1);
-end
-num_samp = max(num_samp, [], "all");
+% num_samp = round(times * fs);
+% for i = 1 : num_elem
+%     num_samp(i) = num_samp(i) + size(rf_data_set{i}, 1);
+% end
+% num_samp = max(num_samp, [], "all");
+% 
+% rf_data = zeros(num_samp, num_elem, num_elem);
+% for i = 1 : num_elem
+%     t_start = round(times(i)*fs);
+%     rf_data(t_start : t_start + size(rf_data_set{i}, 1) - 1, :, i) = rf_data_set{i};
+% end
 
-rf_data = zeros(num_samp, num_elem, num_elem);
-for i = 1 : num_elem
-    t_start = round(times(i)*fs);
-    rf_data(t_start : t_start + size(rf_data_set{i}, 1) - 1, :, i) = rf_data_set{i};
-end
+[rf_data, t_start] = f_rf_comb(rf_data_set, t_start_set, fs);
 
 %% TFM imaging
 roi_width = 40e-3;
@@ -137,7 +139,7 @@ rx_tof = zeros(nz, nx, num_elem);
 f = waitbar(0, "Calculating focal delay");
 for i = 1 : num_elem
     waitbar(i/num_elem, f, "Calculating focal delay");
-    rx_tof(:, :, i) = sqrt((x - elem_x(i)).^2 + z.^2) / c;
+    rx_tof(:, :, i) = sqrt((x - elem_x(i)).^2 + z.^2) / c - t_start;
 end
 close(f);
 

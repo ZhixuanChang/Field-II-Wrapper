@@ -92,7 +92,7 @@ end
 xdc_free(tx_aperture);
 xdc_free(rx_aperture);
 
-rfdata = f_rf_comb(rf_data_set, t_start_set, fs);
+[rfdata, t_start] = f_rf_comb(rf_data_set, t_start_set, fs);
 
 %% reconstructing images
 roi_width = 30e-3;
@@ -120,7 +120,7 @@ close(f);
 f = waitbar(0, 'Calculating scattering ToF');
 for i = 1 : num_elem
     waitbar(i/num_elem, f, 'Calculating scattering ToF');
-    rx_tof(:, :, i) = sqrt((roi_x - elem_x(i)).^2 + (roi_z - elem_z(i)).^2) / c;
+    rx_tof(:, :, i) = sqrt((roi_x - elem_x(i)).^2 + (roi_z - elem_z(i)).^2) / c - t_start;
 end
 close(f);
 
