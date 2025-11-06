@@ -14,9 +14,13 @@ corner_data = reshape(corner_data, 3, 4, []);
 figure();
 for i = 1 : size(corner_data, 3)
     hold on;
-    patch(corner_data(1, :, i), corner_data(2, :, i), 'cyan', 'EdgeColor', 'black', 'LineWidth', 1);
+    if aper_data(1, i) == 0
+        patch(corner_data(1, :, i), corner_data(2, :, i), 'magenta', 'EdgeColor', 'black', 'LineWidth', 1);
+    else
+        patch(corner_data(1, :, i), corner_data(2, :, i), 'cyan', 'EdgeColor', 'black', 'LineWidth', 1);
+    end
 end
 hold off;
-axis equal;
+axis equal tight;
 
 end
