@@ -1,4 +1,4 @@
-function rfdata = h_rf_comb(rf_data_set, t_start_set, fs)
+function rfdata = f_rf_comb(rf_data_set, t_start_set, fs)
 % Align RF data of multiple emission cycles.
 %
 % The calculated RF signals of Field is unaligned. To obtain the spatial spectrum, the signal must be aligned first.

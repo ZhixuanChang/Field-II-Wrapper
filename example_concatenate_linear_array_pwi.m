@@ -92,7 +92,7 @@ end
 xdc_free(tx_aperture);
 xdc_free(rx_aperture);
 
-rfdata = h_rf_comb(rf_data_set, t_start_set, fs);
+rfdata = f_rf_comb(rf_data_set, t_start_set, fs);
 
 %% reconstructing images
 roi_width = 30e-3;
