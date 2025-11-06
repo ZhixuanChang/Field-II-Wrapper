@@ -1,4 +1,25 @@
 function aper = xdc_matrix_array(nx, pitch_x, width_x, ny, pitch_y, width_y, n_sub_x, n_sub_y, focus)
+% Generate 2-D matrix array aperture.
+%
+% The matrix must be parallel to x-axis and y-axis, and the normal direction of the probe plane must be parallel to
+% z-axis.
+%
+% Parameters
+% nx - the number of elements along x-axis.
+% pitch_x - the center distance between adjacent elements along x-axis.
+% width_x - the width of the element along x-axis.
+% ny - the number of elements along y-axis.
+% pitch_y - the center distance between adjacent elements along y-axis.
+% width_y - the width of the element along y-axis.
+% n_sub_x - the subdivision number of each physical element along x-axis.
+% n_sub_y - the subdivision number of each physical element along y-axis.
+% focus - the fixed focus point of the aperture, should be in the shape of [x, y, z].
+%
+% Example
+% aper = xdc_matrix_array(nx, pitch_x, width_x, ny, pitch_y, width_y, n_sub_x, n_sub_y, focus);
+%
+% See also
+% xdc_single_rect, xdc_rectangles
 
 x_vec = (-(nx-1)/2 : (nx-1)/2) * pitch_x;
 y_vec = (-(ny-1)/2 : (ny-1)/2) * pitch_y;

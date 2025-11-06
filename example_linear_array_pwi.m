@@ -52,13 +52,15 @@ impulse_response = impulse_response .* hanning(max(size(impulse_response)))';
 excitation=sin(2*pi*f0*(0:1/fs:2/f0));
 
 % Generate aperture for emission
-emit_aperture = xdc_linear_array_arb(num_elem, pitch, width, height, num_sub_w, num_sub_h, center, angle, focus);
+% emit_aperture = xdc_linear_array_arb(num_elem, pitch, width, height, num_sub_w, num_sub_h, center, angle, focus);
+emit_aperture = xdc_matrix_array(num_elem,pitch,width,1,height,height,num_sub_w,num_sub_h,focus);
 xdc_impulse(emit_aperture, impulse_response);
 xdc_excitation(emit_aperture, excitation);
 xdc_apodization(emit_aperture, 0, ones(1, num_elem));
 
 % Generate aperture for reception
-receive_aperture = xdc_linear_array_arb(num_elem, pitch, width, height, num_sub_w, num_sub_h, center, angle, focus);
+% receive_aperture = xdc_linear_array_arb(num_elem, pitch, width, height, num_sub_w, num_sub_h, center, angle, focus);
+receive_aperture = xdc_matrix_array(num_elem,pitch,width,1,height,height,num_sub_w,num_sub_h,focus);
 xdc_impulse(receive_aperture, impulse_response);
 xdc_apodization(receive_aperture, 0, ones(1, num_elem));
 
@@ -154,8 +156,10 @@ close(f);
 img = abs(img);
 
 figure();
-imagesc(x_vec, z_vec, img);
+imagesc(x_vec*1e3, z_vec*1e3, img);
 axis equal tight;
 hold on;
-plot(scatter_pos(:,1), scatter_pos(:,3), 'ro');
+plot(scatter_pos(:,1)*1e3, scatter_pos(:,3)*1e3, 'ro');
 hold off;
+xlabel('x (mm)');
+ylabel('z (mm)');
