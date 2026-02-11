@@ -1,0 +1,5 @@
+*.asv
+*.mat
+*.png
+tmp*
+*.pdf
