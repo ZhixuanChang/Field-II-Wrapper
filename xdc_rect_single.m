@@ -1,4 +1,4 @@
-function aper = xdc_single_rect(center, len_x, len_y, n_sub_x, n_sub_y, focus)
+function aper = xdc_rect_single(center, len_x, len_y, n_sub_x, n_sub_y, focus)
 % Generate an aperture contains a single rectangular physical element.
 %
 % The aperture must be parallel to x-axis and y-axis, and its normal direction must be parallel to z-axis.
