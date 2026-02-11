@@ -12,7 +12,7 @@ function aper = xdc_concatenate(aper_set, focus)
 % focus - the fixed focus point of the concatenated aperture, should be with a shape of [x, y, z].
 %
 % Examples
-% aper = xdc_concatenate(aper_set);
+% aper = xdc_concatenate(aper_set, focus);
 %
 % See also
 % xdc_retangles, xdc_piston, xdc_single_rect, xdc_matrix_array
