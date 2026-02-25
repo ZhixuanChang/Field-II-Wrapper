@@ -93,7 +93,7 @@ function [rfdata, t_start] = calc_rf(fc, fs, tx_aper, rx_aper, tx_delay, tx_apod
     t_starts = zeros(nu, 1);     % 存储每次发射的起始时间
     
     %% 对每次发射进行仿真
-    fprintf('开始仿真 %d 次发射...\n', nu);
+    % fprintf('开始仿真 %d 次发射...\n', nu);
     
     for i = 1:nu
         % 设置当前发射的延时
@@ -112,9 +112,9 @@ function [rfdata, t_start] = calc_rf(fc, fs, tx_aper, rx_aper, tx_delay, tx_apod
         t_starts(i) = t_start_temp;
         
         % 显示进度
-        if mod(i, max(1, floor(nu/10))) == 0 || i == nu
-            fprintf('发射进度: %d/%d (%.1f%%)\n', i, nu, 100*i/nu);
-        end
+        % if mod(i, max(1, floor(nu/10))) == 0 || i == nu
+        %     fprintf('发射进度: %d/%d (%.1f%%)\n', i, nu, 100*i/nu);
+        % end
     end
     
     %% 对齐所有 RF 数据
@@ -147,15 +147,15 @@ function [rfdata, t_start] = calc_rf(fc, fs, tx_aper, rx_aper, tx_delay, tx_apod
     end
     
     %% 显示摘要信息
-    fprintf('\n仿真完成:\n');
-    fprintf('  发射次数: %d\n', nu);
-    fprintf('  发射阵元数: %d\n', nv_tx);
-    fprintf('  接收阵元数: %d\n', nv);
-    fprintf('  散射体数量: %d\n', ns);
-    fprintf('  中心频率: %.2f MHz\n', fc/1e6);
-    fprintf('  采样频率: %.2f MHz\n', fs/1e6);
-    fprintf('  RF 数据大小: [%d x %d x %d]\n', size(rfdata, 1), ...
-            size(rfdata, 2), size(rfdata, 3));
-    fprintf('  起始时间: %.6f us\n', t_start*1e6);
-    fprintf('  时间跨度: %.6f us\n', max_len/fs*1e6);
+    % fprintf('\n仿真完成:\n');
+    % fprintf('  发射次数: %d\n', nu);
+    % fprintf('  发射阵元数: %d\n', nv_tx);
+    % fprintf('  接收阵元数: %d\n', nv);
+    % fprintf('  散射体数量: %d\n', ns);
+    % fprintf('  中心频率: %.2f MHz\n', fc/1e6);
+    % fprintf('  采样频率: %.2f MHz\n', fs/1e6);
+    % fprintf('  RF 数据大小: [%d x %d x %d]\n', size(rfdata, 1), ...
+    %         size(rfdata, 2), size(rfdata, 3));
+    % fprintf('  起始时间: %.6f us\n', t_start*1e6);
+    % fprintf('  时间跨度: %.6f us\n', max_len/fs*1e6);
 end

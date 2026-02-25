@@ -60,7 +60,12 @@ function [rf, t_start] = calc_scan_rf(fc, fs, tx_aper, rx_aper, tx_delay, tx_apo
     rf_cells = cell(num_scan_pos, 1);     % Store RF data for each scan position
     t_starts = zeros(num_scan_pos, 1);    % Store t_start for each scan position
 
+    % Create waitbar
+    h = waitbar(0, 'Calculating Scanning RF ...');
     for i_scan = 1:num_scan_pos
+        % Update waitbar
+        h = waitbar(i_scan / num_scan_pos, h, 'Calculating Scanning RF ...');
+
         % Get current scanning position
         scan_pos = scanning_path(i_scan, :);  % [x, y, z]
 
@@ -78,10 +83,12 @@ function [rf, t_start] = calc_scan_rf(fc, fs, tx_aper, rx_aper, tx_delay, tx_apo
         t_starts(i_scan) = t_start_temp;
 
         % Display progress
-        if mod(i_scan, max(1, floor(num_scan_pos/10))) == 0 || i_scan == num_scan_pos
-            fprintf('Scanning progress: %d/%d (%.1f%%)\n', i_scan, num_scan_pos, 100*i_scan/num_scan_pos);
-        end
+        % if mod(i_scan, max(1, floor(num_scan_pos/10))) == 0 || i_scan == num_scan_pos
+        %     fprintf('Scanning progress: %d/%d (%.1f%%)\n', i_scan, num_scan_pos, 100*i_scan/num_scan_pos);
+        % end
     end
+    % Close waitbar
+    close(h);
 
     %% Align all RF data to the same t_start
     % Find the minimum start time across all scanning positions
