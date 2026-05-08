@@ -4,3 +4,5 @@
 tmp*
 *.pdf
 test*
+*.bin
+*.json
