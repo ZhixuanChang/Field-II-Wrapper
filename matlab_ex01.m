@@ -89,6 +89,7 @@ toc
 field_end();
 
 [rfdata, rx_delay] = f_rf_comb(rf_data_set, t_start_set, fs);
+rfdata = rfdata ./ max(abs(rfdata(:)));
 
 disp(size(rfdata));
 
@@ -124,10 +125,13 @@ fwrite(fid, jsonencode(config, 'PrettyPrint', true));
 fclose(fid);
 
 file_name = "matlab_ex01.h5";
+if exist(file_name, 'file')
+    delete(file_name);
+end
 h5create(file_name, "/rfdata", size(rfdata), "Datatype", "single");
-h5write(file_name, "/rfdata", rfdata);
+h5write(file_name, "/rfdata", single(rfdata));
 h5create(file_name, "/t_start", size(rx_delay), "Datatype", "single");
-h5write(file_name, "/t_start", rx_delay);
+h5write(file_name, "/t_start", single(rx_delay));
 h5create(file_name, "/fs", size(fs), "Datatype", "single");
-h5write(file_name, "/fs", fs);
+h5write(file_name, "/fs", single(fs));
 h5disp(file_name);
