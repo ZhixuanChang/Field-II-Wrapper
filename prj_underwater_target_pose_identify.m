@@ -153,11 +153,12 @@ return;
 
 %% Postprocessing
 
-close all;
+% load configurations
+config = jsondecode(fileread("data/prj_uw_target_pose_identify.json"));
 
 % Volume viewing
 img = h5read("data/prj_uw_target_pose_identify_img.h5", "/img");
-volumeViewer(img);
+% volumeViewer(img);
 
 % MIP curves along each axis
 img_nx = round(config.roiSize.x / config.roiPixelSize.x);
@@ -173,17 +174,42 @@ img_y_vec = (-img_ny/2 : (img_ny/2 - 1)) * img_dy + config.roiPos.y;
 img_z_vec = (-img_nz/2 : (img_nz/2 - 1)) * img_dz + config.roiPos.z;
 
 [~, x_slice_ind] = min(abs(img_x_vec - 0));
-img_y_slice = squeeze(img(x_slice_ind));
+img_y_slice = squeeze(img(x_slice_ind, :, :));
 img_y_slice = img_y_slice';
 
-figure();
-tiledlayout(2, 1, "TileSpacing", "compact", "Padding", "compact");
+[~, y_slice_ind] = min(abs(img_y_vec - 0));
+img_x_slice = squeeze(img(:, y_slice_ind, :));
+img_x_slice = img_x_slice';
+
+figure('Position', [100, 100, 800, 300]);
+tiledlayout(2, 2, "TileSpacing", "compact", "Padding", "compact");
+
 nexttile();
 imagesc(img_y_vec * 1e3, img_z_vec * 1e3, img_y_slice);
+axis equal tight;
 xlabel("y (mm)");
 ylabel("z (mm)");
+title("Slice at x = 0");
+
 nexttile();
-plot(img_y_vec, max(img_y_slice));
+imagesc(img_x_vec * 1e3, img_z_vec * 1e3, img_x_slice);
+axis equal tight;
+xlabel("x (mm)");
+ylabel("z (mm)");
+title("Slice at y = 0");
+
+nexttile();
+mip_y = single(max(img_y_slice));
+mip_y = mip_y ./ max(mip_y);
+plot(img_y_vec * 1e3, mip_y);
 xlabel("y (mm)");
 ylabel("Amplitude");
+
+nexttile();
+mip_x = single(max(img_x_slice));
+mip_x = mip_x ./ max(mip_x);
+plot(img_x_vec * 1e3, mip_x);
+xlabel("x (mm)");
+ylabel("Amplitude");
+
 % f_show_image(img(x_slice_ind, :, :));
