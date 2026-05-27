@@ -135,3 +135,10 @@ h5write(file_name, "/t_start", single(rx_delay));
 h5create(file_name, "/fs", size(fs), "Datatype", "single");
 h5write(file_name, "/fs", single(fs));
 h5disp(file_name);
+
+%% Postprocessing
+
+% Volume viewing
+img = h5read("data/matlab_ex01_img.h5", "/img");
+% volumeViewer(img);
+f_show_image(img);
