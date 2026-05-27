@@ -10,23 +10,31 @@ c = 1500;
 
 nx = 16;
 ny = 16;
-pitch = 0.75e-3;
-width = 0.7e-3;
+pitch = 10.0e-3;
+width = 8.5e-3;
 kerf = pitch - width;
-math_size = 0.1e-3;
+math_size = 0.25e-3;
 focus = [0, 0, 1000];
 
-scat_x_vec = -4e-3 : 4e-3 : 4e-3;
-scat_y_vec = -4e-3 : 4e-3 : 4e-3;
-scat_z_vec = 15e-3;
+scat_x_vec = -50e-3 : 50e-3 : 50e-3;
+scat_y_vec = -50e-3 : 50e-3 : 50e-3;
+scat_z_vec = 120e-3;
 
 [scat_x, scat_y, scat_z] = ndgrid(scat_x_vec, scat_y_vec, scat_z_vec);
-scat_pos = [reshape(scat_x, [], 1), reshape(scat_y, [], 1), reshape(scat_z, [], 1)];
+scat_center_pos = [reshape(scat_x, [], 1), reshape(scat_y, [], 1), reshape(scat_z, [], 1)];
+
+scat_pos = [];
+for i = 1 : size(scat_center_pos, 1)
+    scat_tmp = gen_sphere_solid(scat_center_pos(i, :), 1e-3, 0.5e-3);
+    scat_pos = [scat_pos; scat_tmp];
+end
 scat_amp = ones(size(scat_pos,1), 1);
+
+disp("The number of scatterers:");
+disp(size(scat_amp,1));
 
 % figure(1);
 % scatter3(scat_pos(:,1), scat_pos(:,2), scat_pos(:,3));
-
 % return;
 
 %% 
@@ -59,6 +67,8 @@ t_start_set = zeros(1, num_elem);
 bar_length = 40;    % 进度条的视觉长度 (字符数)
 reverse_str = '';   % 初始化退格字符串 (关键：用于清除上一行)
 
+tic
+
 fprintf("Simulation start ...\n");
 for i = 1 : num_elem
     tx_apod = zeros(1, num_elem);
@@ -82,15 +92,23 @@ for i = 1 : num_elem
 end
 fprintf("\nSimulation finished!\n");
 
+toc
+
 field_end();
 
 [rfdata, rx_delay] = f_rf_comb(rf_data_set, t_start_set, fs);
+rfdata = rfdata ./ max(abs(rfdata(:)));
 
 disp(size(rfdata));
 
-%% save data
+div = 10;
+rfdata = rfdata(1:div:end, :, :);
+fs = fs / div;
 
-% save configuration
+% return
+
+%% save configuration
+
 config.fc = fc;
 config.fs = fs;
 config.bandwidth = 0.8;
@@ -105,23 +123,67 @@ config.c = c;
 config.rxDelay = rx_delay;
 config.roiPos.x = 0e-3;
 config.roiPos.y = 0e-3;
-config.roiPos.z = 15e-3;
-config.roiPixelSize.x = 0.5e-3;
-config.roiPixelSize.y = 0.5e-3;
-config.roiPixelSize.z = 0.5e-3;
-config.roiSize.x = 15e-3;
-config.roiSize.y = 15e-3;
-config.roiSize.z = 10e-3;
+config.roiPos.z = 120e-3;
+config.roiPixelSize.x = 1e-3;
+config.roiPixelSize.y = 1e-3;
+config.roiPixelSize.z = 1e-3;
+config.roiSize.x = 180e-3;
+config.roiSize.y = 160e-3;
+config.roiSize.z = 40e-3;
 
-fid = fopen("underwater_target_pose_identify_sim01.json", "w");
+fid = fopen("data/prj_uw_target_pose_identify.json", "w");
 fwrite(fid, jsonencode(config, 'PrettyPrint', true));
 fclose(fid);
 
-file_name = "underwater_target_pose_identify_sim01.h5";
+%% save RF data
+
+file_name = "data/prj_uw_target_pose_identify.h5";
+if exist(file_name, 'file')
+    delete(file_name);
+end
 h5create(file_name, "/rfdata", size(rfdata), "Datatype", "single");
-h5write(file_name, "/rfdata", rfdata);
+h5write(file_name, "/rfdata", single(rfdata));
 h5create(file_name, "/t_start", size(rx_delay), "Datatype", "single");
-h5write(file_name, "/t_start", rx_delay);
+h5write(file_name, "/t_start", single(rx_delay));
 h5create(file_name, "/fs", size(fs), "Datatype", "single");
-h5write(file_name, "/fs", fs);
+h5write(file_name, "/fs", single(fs));
 h5disp(file_name);
+
+return;
+
+%% Postprocessing
+
+close all;
+
+% Volume viewing
+img = h5read("data/prj_uw_target_pose_identify_img.h5", "/img");
+volumeViewer(img);
+
+% MIP curves along each axis
+img_nx = round(config.roiSize.x / config.roiPixelSize.x);
+img_ny = round(config.roiSize.y / config.roiPixelSize.y);
+img_nz = round(config.roiSize.z / config.roiPixelSize.z);
+
+img_dx = config.roiPixelSize.x;
+img_dy = config.roiPixelSize.y;
+img_dz = config.roiPixelSize.z;
+
+img_x_vec = (-img_nx/2 : (img_nx/2 - 1)) * img_dx + config.roiPos.x;
+img_y_vec = (-img_ny/2 : (img_ny/2 - 1)) * img_dy + config.roiPos.y;
+img_z_vec = (-img_nz/2 : (img_nz/2 - 1)) * img_dz + config.roiPos.z;
+
+[~, x_slice_ind] = min(abs(img_x_vec - 0));
+img_y_slice = squeeze(img(x_slice_ind));
+img_y_slice = img_y_slice';
+
+figure();
+tiledlayout(2, 1, "TileSpacing", "compact", "Padding", "compact");
+nexttile();
+imagesc(img_y_vec * 1e3, img_z_vec * 1e3, img_y_slice);
+xlabel("y (mm)");
+ylabel("z (mm)");
+nexttile();
+plot(img_y_vec, max(img_y_slice));
+xlabel("y (mm)");
+ylabel("Amplitude");
+% f_show_image(img(x_slice_ind, :, :));
