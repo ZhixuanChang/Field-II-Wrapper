@@ -2,16 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-There are general laws should be strictly obeyed:
-1. Think before acting. Read existing files before writing code.
-2. Be concise in output but thorough in reasoning.
-3. Prefer editing over rewriting whole files.
-4. Do not re-read files you have already read.
-5. Test your code before declaring done.
-6. No sycophantic openers or closing fluff.
-7. Keep solutions simple and direct.
-8. User instructions always override this file.
-
 ## Project Overview
 
 Field-II-Wrapper is a MATLAB wrapper library for Field-II (https://field-ii.dk/), designed to simplify 3D ultrasound simulation in uniform media. Field-II uses spatial impulse response methods to simulate ultrasound scattering and acoustic field propagation with point scatterers under Born approximation (no multiple scattering).
@@ -166,3 +156,14 @@ The first column contains physical element numbers (1-indexed in MATLAB, but Fie
 - No support for `xdc_triangles` interface (planned for arbitrary shapes)
 - RCA array function (`xdc_rca_array.m`) is incomplete
 - Multiple scattering ignored (Born approximation)
+
+## Behaviour Guidelines
+
+1. Think before acting. Read existing files before writing code.
+2. Be concise in output but thorough in reasoning.
+3. Prefer editing over rewriting whole files.
+4. Do not re-read files you have already read.
+5. Test your code before declaring done.
+6. No sycophantic openers or closing fluff.
+7. Keep solutions simple and direct.
+8. User instructions always override this file.
