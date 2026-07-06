@@ -14,24 +14,36 @@ height = 10e-3;
 num_elem = 128;
 focus = [0, 0, 1000];
 
+aper = num_elem * pitch;
+fprintf("Aperture size: %f\n", aper);
+% return;
+
 % scatter distribution
-dx = 1e-3;
-h = 5;
-mean_depth = 3.5;
-seabed_terrain = generate_seabed_terrain(dx, h, mean_depth);
+% dx = 1e-3;
+% h = 5;
+% mean_depth = 3.5;
+% seabed_terrain = generate_seabed_terrain(dx, h, mean_depth);
 
 % figure(1);
 % plot(seabed_terrain(:, 1), seabed_terrain(:, 2));
 % axis tight;
 % return;
 
-scat_pos = [seabed_terrain(:,1), zeros(size(seabed_terrain,1),1), seabed_terrain(:,2)];
-scat_amp = ones(size(seabed_terrain,1),1);
+% scat_pos = [seabed_terrain(:,1), zeros(size(seabed_terrain,1),1), seabed_terrain(:,2)];
+% scat_amp = ones(size(seabed_terrain,1),1);
+
+scat_x_vec = -300e-3 : 100e-3 : 300e-3;
+scat_y_vec = 0;
+scat_z_vec = 200e-3 : 100e-3 : 400e-3;
+
+[scat_x_mesh, scat_y_mesh, scat_z_mesh] = meshgrid(scat_x_vec, scat_y_vec, scat_z_vec);
+scat_pos = [scat_x_mesh(:), scat_y_mesh(:), scat_z_mesh(:)];
+scat_amp = ones(size(scat_pos,1), 1);
 
 % beamforming parameters
 steered_angles = (-60 : 0.2 : 60) / 180 * pi;
 
-fprintf("Scatter number: %d\n", size(seabed_terrain, 1));
+fprintf("Scatter number: %d\n", length(scat_amp));
 fprintf("Emission cycles: %d\n", length(steered_angles));
 
 % return
@@ -99,3 +111,15 @@ xdc_free(tx_aper);
 xdc_free(rx_aper);
 
 field_end;
+
+%% Saving data
+
+[rfdataRaw, t_start] = f_rf_comb(rf_data_set, t_start_set, fs);
+disp(size(rfdataRaw));
+
+rfdata = rfdataRaw(1:5:end, :, :);
+fs_new = fs / 5;
+save("multibeam_sim01.mat", "fs_new", "c", "fc", "steered_angles", "t_start");
+
+h5create("multibeam_sim01_rfdata.h5", "/rfdata", size(rfdata), "Datatype", "single");
+h5write("multibeam_sim01_rfdata.h5", "/rfdata", single(rfdata));

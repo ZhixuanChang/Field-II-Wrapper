@@ -8,3 +8,6 @@ test*
 *.json
 *.h5
 *.docx
+*.ply
+
+img_demo.txt
